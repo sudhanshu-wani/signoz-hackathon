@@ -1,0 +1,13 @@
+# SigNoz deployment declared for Foundry (foundryctl).
+# Judges re-run Foundry against this + casting.yaml.lock to reproduce the deploy.
+#
+# This is the minimal Docker Compose casting. If `foundryctl gen examples`
+# produces a richer file for your version, prefer that generated one and commit
+# it here (plus the casting.yaml.lock that `foundryctl cast` writes).
+apiVersion: v1alpha1
+metadata:
+  name: signoz
+spec:
+  deployment:
+    mode: docker
+    flavor: compose
