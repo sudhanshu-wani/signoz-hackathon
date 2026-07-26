@@ -23,13 +23,30 @@ export OPENAI_BASE_URL=http://localhost:8900/v1
 Works with cloud APIs (set `UPSTREAM_BASE_URL` + `UPSTREAM_API_KEY`) and local
 Ollama (`UPSTREAM_BASE_URL=http://localhost:11434/v1`, no key).
 
-## Run it
+## For judges — run everything with one script
+```bash
+# one-time (~5 min): SigNoz via Foundry + Ollama
+curl -fsSL https://signoz.io/foundry.sh | bash && foundryctl cast -f casting.yaml
+#   -> open http://localhost:8080, create the admin account
+#      (SigNoz silently drops telemetry until the first account exists)
+curl -fsSL https://ollama.com/install.sh | sh
+
+# then ONE command (uses the account you just created):
+SIGNOZ_EMAIL=you@example.com SIGNOZ_PASSWORD=yourpass ./judge_demo.sh
+```
+`judge_demo.sh` checks services, pulls two small local models, runs the offline
+test suite, starts the proxy, imports the dashboard, sends real traffic, injects
+real failures, and tells you exactly which panels/traces to look at. **Zero-
+service quick check:** `pip install -e ".[dev]" && pytest -q` — the suite runs
+fully offline.
+
+## Run it manually
 ```bash
 cp .env.example .env                     # set UPSTREAM_BASE_URL, SIGNOZ_*
 uv venv && uv pip install -e ".[dev]"
 uvicorn proxy.server:app --port 8900     # start the proxy
-python proxy/dashboards/apply.py         # dashboards + cost-spike alert
-python scripts/generate_traffic.py --n 50   # real traffic -> real telemetry
+python proxy/dashboards/apply.py         # dashboard (+ alert spec; see note)
+python scripts/generate_traffic.py --n 50 --mix   # real traffic -> real telemetry
 #  open SigNoz -> "LLM Proxy" dashboard
 ```
 

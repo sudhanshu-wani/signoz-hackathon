@@ -28,8 +28,9 @@ def _load(name: str) -> dict:
 
 def main() -> int:
     load_dotenv()
-    if not os.getenv("SIGNOZ_API_KEY"):
-        print("ERROR: SIGNOZ_API_KEY not set (Settings -> Service Accounts -> Keys).", file=sys.stderr)
+    if not (os.getenv("SIGNOZ_API_KEY") or (os.getenv("SIGNOZ_EMAIL") and os.getenv("SIGNOZ_PASSWORD"))):
+        print("ERROR: set SIGNOZ_API_KEY, or SIGNOZ_EMAIL + SIGNOZ_PASSWORD (your SigNoz login), in .env.",
+              file=sys.stderr)
         return 2
 
     client = SigNozClient()

@@ -22,14 +22,36 @@ import httpx
 
 
 class SigNozClient:
+    """Auth, in order of preference:
+    1. SIGNOZ_API_KEY  -> `SIGNOZ-API-KEY` header (Settings -> API keys).
+    2. SIGNOZ_EMAIL + SIGNOZ_PASSWORD -> login flow (org discovered via
+       /api/v2/sessions/context, JWT via /api/v2/sessions/email_password).
+    """
+
     def __init__(self, base_url: str | None = None, api_key: str | None = None, timeout: float = 30.0):
         self.base_url = (base_url or os.getenv("SIGNOZ_API_URL", "http://localhost:8080")).rstrip("/")
         self.api_key = api_key or os.getenv("SIGNOZ_API_KEY", "")
-        self._client = httpx.Client(
-            base_url=self.base_url,
-            timeout=timeout,
-            headers={"SIGNOZ-API-KEY": self.api_key, "Content-Type": "application/json"},
+        headers = {"Content-Type": "application/json"}
+        if self.api_key:
+            headers["SIGNOZ-API-KEY"] = self.api_key
+        self._client = httpx.Client(base_url=self.base_url, timeout=timeout, headers=headers)
+        if not self.api_key:
+            email = os.getenv("SIGNOZ_EMAIL", "")
+            password = os.getenv("SIGNOZ_PASSWORD", "")
+            if email and password:
+                self._login(email, password)
+
+    def _login(self, email: str, password: str) -> None:
+        ctx = self._client.get(f"/api/v2/sessions/context?email={email}")
+        ctx.raise_for_status()
+        orgs = ctx.json()["data"]["orgs"]
+        r = self._client.post(
+            "/api/v2/sessions/email_password",
+            json={"email": email, "password": password, "orgID": orgs[0]["id"]},
         )
+        r.raise_for_status()
+        token = r.json()["data"]["accessToken"]
+        self._client.headers["Authorization"] = f"Bearer {token}"
 
     # --- generic ---
     def post(self, path: str, json: dict) -> dict:
@@ -45,10 +67,10 @@ class SigNozClient:
     def close(self) -> None:
         self._client.close()
 
-    # --- dashboards (stable: /api/v2/dashboards) ---
+    # --- dashboards (verified on v0.134: POST /api/v1/dashboards, raw body) ---
     def create_dashboard(self, dashboard_json: dict) -> dict:
         """Create a dashboard from an exported dashboard JSON body."""
-        return self.post("/api/v2/dashboards", {"data": dashboard_json})
+        return self.post("/api/v1/dashboards", dashboard_json)
 
     # --- alerts (stable: /api/v1/rules) ---
     def create_alert(self, rule_json: dict) -> dict:
