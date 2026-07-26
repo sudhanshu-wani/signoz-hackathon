@@ -45,7 +45,8 @@
                   "spaceAggregation": "sum",
                   "temporality": "cumulative"
                 }
-              ]
+              ],
+              "reduceTo": "sum"
             }
           ],
           "queryFormulas": []
@@ -177,7 +178,8 @@
                   "spaceAggregation": "sum",
                   "temporality": "cumulative"
                 }
-              ]
+              ],
+              "reduceTo": "sum"
             }
           ],
           "queryFormulas": []
