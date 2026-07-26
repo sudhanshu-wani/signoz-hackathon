@@ -20,3 +20,12 @@ Metrics emitted by the proxy (`proxy/telemetry.py`):
 ## Alert (see cost_spike_alert.json)
 Fire when `sum(llm.cost.usd)` over 5m crosses a budget threshold — a runaway-spend
 guard for anyone's local AI usage.
+
+## Rendering gotchas learned on SigNoz v0.134 (why dashboard.json looks the way it does)
+- Widgets are invisible without `layout` grid entries (react-grid: i/x/y/w/h).
+- Counter metrics need `timeAggregation: increase|rate` — `null` renders a query error.
+- OTel histograms register under suffixed series (`.bucket/.sum/.count`); query
+  `llm.request.duration.bucket` with `spaceAggregation: p95`, not the base name.
+- `value` panels: no `groupBy` (they print the label, not the number) and set
+  `reduceTo: sum` (default shows the latest 1-min bucket — zero between bursts).
+- Per-minute counts: use a `bar` panel; line charts don't draw isolated points.

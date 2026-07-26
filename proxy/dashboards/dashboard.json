@@ -1,228 +1,188 @@
 {
-  "title": "LLM Proxy \u2014 AI usage observability (Agents of SigNoz)",
   "description": "Cost, tokens, latency, and errors for all AI usage flowing through the proxy. See panels.md for the authoritative query spec.",
+  "layout": [
+    {
+      "h": 6,
+      "i": "cost-by-model",
+      "moved": false,
+      "static": false,
+      "w": 6,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "h": 6,
+      "i": "requests-by-model",
+      "moved": false,
+      "static": false,
+      "w": 6,
+      "x": 6,
+      "y": 0
+    },
+    {
+      "h": 6,
+      "i": "latency-p95",
+      "moved": false,
+      "static": false,
+      "w": 6,
+      "x": 0,
+      "y": 6
+    },
+    {
+      "h": 6,
+      "i": "tokens-by-model",
+      "moved": false,
+      "static": false,
+      "w": 6,
+      "x": 6,
+      "y": 6
+    }
+  ],
   "tags": [
     "hackathon",
     "llm-proxy",
     "genai"
   ],
-  "version": "v4",
+  "title": "LLM Proxy \u2014 AI usage observability (Agents of SigNoz)",
+  "version": "v5",
   "widgets": [
     {
       "id": "cost-by-model",
-      "title": "Cost by model ($)",
       "panelTypes": "value",
       "query": {
-        "queryType": "builder",
         "builder": {
           "queryData": [
             {
-              "dataSource": "metrics",
-              "queryName": "A",
-              "expression": "A",
-              "aggregateOperator": "sum",
-              "aggregateAttribute": {
-                "key": "llm.cost.usd",
-                "dataType": "float64",
-                "type": "Sum"
-              },
-              "groupBy": [
-                {
-                  "key": "model",
-                  "dataType": "string",
-                  "type": "tag"
-                }
-              ],
-              "filters": {
-                "op": "AND",
-                "items": []
-              },
-              "legend": "{{model}}",
               "aggregations": [
                 {
                   "metricName": "llm.cost.usd",
-                  "timeAggregation": "increase",
                   "spaceAggregation": "sum",
-                  "temporality": "cumulative"
+                  "temporality": "cumulative",
+                  "timeAggregation": "increase"
                 }
               ],
+              "dataSource": "metrics",
+              "expression": "A",
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "",
+              "queryName": "A",
               "reduceTo": "sum"
             }
           ],
           "queryFormulas": []
-        }
-      }
+        },
+        "queryType": "builder"
+      },
+      "title": "Cost ($)"
     },
     {
       "id": "requests-by-model",
-      "title": "Requests per minute by model",
-      "panelTypes": "graph",
+      "panelTypes": "bar",
       "query": {
-        "queryType": "builder",
         "builder": {
           "queryData": [
             {
-              "dataSource": "metrics",
-              "queryName": "A",
-              "expression": "A",
-              "aggregateOperator": "rate",
-              "aggregateAttribute": {
-                "key": "llm.requests",
-                "dataType": "float64",
-                "type": "Sum"
-              },
-              "groupBy": [
-                {
-                  "key": "model",
-                  "dataType": "string",
-                  "type": "tag"
-                }
-              ],
-              "filters": {
-                "op": "AND",
-                "items": []
-              },
-              "legend": "{{model}}",
               "aggregations": [
                 {
                   "metricName": "llm.requests",
-                  "timeAggregation": "increase",
-                  "spaceAggregation": "sum",
-                  "temporality": "cumulative"
+                  "spaceAggregation": "rate",
+                  "temporality": "cumulative",
+                  "timeAggregation": "increase"
                 }
-              ]
+              ],
+              "dataSource": "metrics",
+              "expression": "A",
+              "groupBy": [
+                {
+                  "dataType": "string",
+                  "key": "model",
+                  "type": "tag"
+                }
+              ],
+              "having": {
+                "expression": ""
+              },
+              "legend": "{{model}}",
+              "queryName": "A"
             }
           ],
           "queryFormulas": []
-        }
-      }
+        },
+        "queryType": "builder"
+      },
+      "title": "Requests per minute by model"
     },
     {
       "id": "latency-p95",
-      "title": "P95 latency by model (ms)",
       "panelTypes": "graph",
       "query": {
-        "queryType": "builder",
         "builder": {
           "queryData": [
             {
-              "dataSource": "metrics",
-              "queryName": "A",
-              "expression": "A",
-              "aggregateOperator": "p95",
-              "aggregateAttribute": {
-                "key": "llm.request.duration",
-                "dataType": "float64",
-                "type": "Histogram"
-              },
-              "groupBy": [
-                {
-                  "key": "model",
-                  "dataType": "string",
-                  "type": "tag"
-                }
-              ],
-              "filters": {
-                "op": "AND",
-                "items": []
-              },
-              "legend": "{{model}}",
               "aggregations": [
                 {
                   "metricName": "llm.request.duration.bucket",
-                  "timeAggregation": null,
                   "spaceAggregation": "p95",
-                  "temporality": null
+                  "temporality": null,
+                  "timeAggregation": null
                 }
-              ]
-            }
-          ],
-          "queryFormulas": []
-        }
-      }
-    },
-    {
-      "id": "tokens-by-model",
-      "title": "Tokens by model",
-      "panelTypes": "value",
-      "query": {
-        "queryType": "builder",
-        "builder": {
-          "queryData": [
-            {
+              ],
               "dataSource": "metrics",
-              "queryName": "A",
               "expression": "A",
-              "aggregateOperator": "sum",
-              "aggregateAttribute": {
-                "key": "llm.tokens",
-                "dataType": "float64",
-                "type": "Sum"
-              },
               "groupBy": [
                 {
-                  "key": "model",
                   "dataType": "string",
+                  "key": "model",
                   "type": "tag"
                 }
               ],
-              "filters": {
-                "op": "AND",
-                "items": []
+              "having": {
+                "expression": ""
               },
               "legend": "{{model}}",
+              "queryName": "A"
+            }
+          ],
+          "queryFormulas": []
+        },
+        "queryType": "builder"
+      },
+      "title": "P95 latency by model (ms)"
+    },
+    {
+      "id": "tokens-by-model",
+      "panelTypes": "value",
+      "query": {
+        "builder": {
+          "queryData": [
+            {
               "aggregations": [
                 {
                   "metricName": "llm.tokens",
-                  "timeAggregation": "increase",
                   "spaceAggregation": "sum",
-                  "temporality": "cumulative"
+                  "temporality": "cumulative",
+                  "timeAggregation": "increase"
                 }
               ],
+              "dataSource": "metrics",
+              "expression": "A",
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "",
+              "queryName": "A",
               "reduceTo": "sum"
             }
           ],
           "queryFormulas": []
-        }
-      }
-    }
-  ],
-  "layout": [
-    {
-      "i": "cost-by-model",
-      "x": 0,
-      "y": 0,
-      "w": 6,
-      "h": 6,
-      "moved": false,
-      "static": false
-    },
-    {
-      "i": "requests-by-model",
-      "x": 6,
-      "y": 0,
-      "w": 6,
-      "h": 6,
-      "moved": false,
-      "static": false
-    },
-    {
-      "i": "latency-p95",
-      "x": 0,
-      "y": 6,
-      "w": 6,
-      "h": 6,
-      "moved": false,
-      "static": false
-    },
-    {
-      "i": "tokens-by-model",
-      "x": 6,
-      "y": 6,
-      "w": 6,
-      "h": 6,
-      "moved": false,
-      "static": false
+        },
+        "queryType": "builder"
+      },
+      "title": "Tokens"
     }
   ]
 }
