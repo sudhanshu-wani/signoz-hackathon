@@ -204,7 +204,7 @@
     },
     {
       "id": "error-rate",
-      "panelTypes": "graph",
+      "panelTypes": "bar",
       "query": {
         "builder": {
           "queryData": [
