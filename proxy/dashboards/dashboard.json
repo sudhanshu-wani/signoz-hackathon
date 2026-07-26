@@ -36,6 +36,24 @@
       "w": 6,
       "x": 6,
       "y": 6
+    },
+    {
+      "h": 6,
+      "i": "error-rate",
+      "moved": false,
+      "static": false,
+      "w": 6,
+      "x": 0,
+      "y": 12
+    },
+    {
+      "h": 6,
+      "i": "cost-by-feature",
+      "moved": false,
+      "static": false,
+      "w": 6,
+      "x": 6,
+      "y": 12
     }
   ],
   "tags": [
@@ -88,7 +106,7 @@
               "aggregations": [
                 {
                   "metricName": "llm.requests",
-                  "spaceAggregation": "rate",
+                  "spaceAggregation": "sum",
                   "temporality": "cumulative",
                   "timeAggregation": "increase"
                 }
@@ -183,6 +201,116 @@
         "queryType": "builder"
       },
       "title": "Tokens"
+    },
+    {
+      "id": "error-rate",
+      "panelTypes": "graph",
+      "query": {
+        "builder": {
+          "queryData": [
+            {
+              "aggregations": [
+                {
+                  "metricName": "llm.requests",
+                  "spaceAggregation": "sum",
+                  "temporality": "cumulative",
+                  "timeAggregation": "increase"
+                }
+              ],
+              "dataSource": "metrics",
+              "disabled": true,
+              "expression": "A",
+              "filter": {
+                "expression": "status != '200'"
+              },
+              "groupBy": [
+                {
+                  "dataType": "string",
+                  "key": "model",
+                  "type": "tag"
+                }
+              ],
+              "having": {
+                "expression": ""
+              },
+              "legend": "",
+              "queryName": "A"
+            },
+            {
+              "aggregations": [
+                {
+                  "metricName": "llm.requests",
+                  "spaceAggregation": "sum",
+                  "temporality": "cumulative",
+                  "timeAggregation": "increase"
+                }
+              ],
+              "dataSource": "metrics",
+              "disabled": true,
+              "expression": "B",
+              "groupBy": [
+                {
+                  "dataType": "string",
+                  "key": "model",
+                  "type": "tag"
+                }
+              ],
+              "having": {
+                "expression": ""
+              },
+              "legend": "",
+              "queryName": "B"
+            }
+          ],
+          "queryFormulas": [
+            {
+              "expression": "(A/B)*100",
+              "legend": "{{model}} error %",
+              "queryName": "F1"
+            }
+          ]
+        },
+        "queryType": "builder"
+      },
+      "title": "Error rate % \u2014 is a model failing?"
+    },
+    {
+      "id": "cost-by-feature",
+      "panelTypes": "bar",
+      "query": {
+        "builder": {
+          "queryData": [
+            {
+              "aggregations": [
+                {
+                  "metricName": "llm.cost.usd",
+                  "spaceAggregation": "sum",
+                  "temporality": "cumulative",
+                  "timeAggregation": "increase"
+                }
+              ],
+              "dataSource": "metrics",
+              "disabled": false,
+              "expression": "A",
+              "groupBy": [
+                {
+                  "dataType": "string",
+                  "key": "feature",
+                  "type": "tag"
+                }
+              ],
+              "having": {
+                "expression": ""
+              },
+              "legend": "{{feature}}",
+              "queryName": "A"
+            }
+          ],
+          "queryFormulas": []
+        },
+        "queryType": "builder"
+      },
+      "title": "Cost by feature \u2014 which feature is burning money?"
     }
   ]
 }

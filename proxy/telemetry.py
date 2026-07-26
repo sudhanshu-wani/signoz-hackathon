@@ -43,6 +43,7 @@ def record_llm_call(
     error: bool = False,
     session_id: str | None = None,
     outcome: str | None = None,
+    feature: str | None = None,
     start_time_ns: int | None = None,
     end_time_ns: int | None = None,
 ) -> float:
@@ -67,14 +68,21 @@ def record_llm_call(
             span.set_attribute(A.SESSION_ID, session_id)
         if outcome:
             span.set_attribute(A.TASK_OUTCOME, outcome)
+        if feature:
+            span.set_attribute(A.TASK_FEATURE, feature)
         if error:
             span.set_status(Status(StatusCode.ERROR))
     finally:
         span.end(end_time=end_time_ns)
 
     dims = {"model": model, "status": str(status_code)}
+    if feature:
+        dims["feature"] = feature
+    cost_dims = {"model": model}
+    if feature:
+        cost_dims["feature"] = feature
     i = _instruments()
-    i["cost"].add(cost, {"model": model})
+    i["cost"].add(cost, cost_dims)
     i["requests"].add(1, dims)
     i["latency"].record(duration_ms, {"model": model})
     i["tokens"].add(input_tokens + output_tokens, {"model": model})

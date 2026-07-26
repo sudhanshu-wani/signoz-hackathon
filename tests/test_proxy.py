@@ -40,13 +40,14 @@ def test_proxy_passthrough_and_records(client, monkeypatch):
     r = client.post("/v1/chat/completions", json={
         "model": "qwen2.5:3b",
         "messages": [{"role": "user", "content": "hello there friend"}],
-    }, headers={"x-session-id": "sess-1"})
+    }, headers={"x-session-id": "sess-1", "x-feature": "search"})
 
     assert r.status_code == 200
     assert r.json()["usage"]["prompt_tokens"] > 0            # passthrough intact
     assert captured["model"] == "qwen2.5:3b"
     assert captured["input_tokens"] > 0                       # usage extracted
     assert captured["session_id"] == "sess-1"                # header propagated
+    assert captured["feature"] == "search"                   # feature label propagated
     assert captured["error"] is False
 
 

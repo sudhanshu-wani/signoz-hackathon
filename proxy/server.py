@@ -44,6 +44,7 @@ async def chat_completions(request: Request):
     model = body.get("model", "unknown")
     session_id = request.headers.get("x-session-id")
     outcome = request.headers.get("x-task-outcome")
+    feature = request.headers.get("x-feature")
 
     t0 = time.perf_counter()
     start_ns = time.time_ns()
@@ -55,7 +56,7 @@ async def chat_completions(request: Request):
         duration_ms = (time.perf_counter() - t0) * 1000
         record_llm_call(model=model, input_tokens=0, output_tokens=0,
                         duration_ms=duration_ms, status_code=502, error=True,
-                        session_id=session_id, outcome=outcome,
+                        session_id=session_id, outcome=outcome, feature=feature,
                         start_time_ns=start_ns, end_time_ns=time.time_ns())
         return JSONResponse(status_code=502, content={"error": {"message": str(e)}})
 
@@ -73,7 +74,7 @@ async def chat_completions(request: Request):
             input_tokens=in_tok, output_tokens=out_tok,
             duration_ms=duration_ms, status_code=upstream.status_code,
             error=upstream.status_code >= 400, session_id=session_id, outcome=outcome,
-            start_time_ns=start_ns, end_time_ns=end_ns,
+            feature=feature, start_time_ns=start_ns, end_time_ns=end_ns,
         )
         return JSONResponse(status_code=upstream.status_code, content=data)
 
@@ -81,5 +82,5 @@ async def chat_completions(request: Request):
     record_llm_call(model=model, input_tokens=0, output_tokens=0,
                     duration_ms=duration_ms, status_code=upstream.status_code,
                     error=upstream.status_code >= 400, session_id=session_id, outcome=outcome,
-                    start_time_ns=start_ns, end_time_ns=end_ns)
+                    feature=feature, start_time_ns=start_ns, end_time_ns=end_ns)
     return JSONResponse(status_code=upstream.status_code, content={"raw": upstream.text})

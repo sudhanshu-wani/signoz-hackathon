@@ -29,3 +29,11 @@ guard for anyone's local AI usage.
 - `value` panels: no `groupBy` (they print the label, not the number) and set
   `reduceTo: sum` (default shows the latest 1-min bucket — zero between bursts).
 - Per-minute counts: use a `bar` panel; line charts don't draw isolated points.
+- `spaceAggregation` must be `sum` when `timeAggregation` is `increase` — a
+  leftover `rate` spaceAggregation renders a query error.
+
+## v2 incident panels
+7. **Error rate %** — formula `(A/B)*100`: A=`llm.requests{status!='200'}`,
+   B=all, by `model`. Lights up during failure injection.
+8. **Cost by feature** — `llm.cost.usd` increase by `feature` (bar). Requires
+   clients to send `X-Feature`; the traffic generator does.
