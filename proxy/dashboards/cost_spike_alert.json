@@ -1,0 +1,29 @@
+{
+  "alert": "LLM spend spike (proxy)",
+  "alertType": "METRIC_BASED_ALERT",
+  "ruleType": "threshold_rule",
+  "evalWindow": "5m0s",
+  "frequency": "1m0s",
+  "condition": {
+    "op": ">",
+    "target": 0.50,
+    "matchType": "1",
+    "compositeQuery": {
+      "queryType": "builder",
+      "panelType": "value",
+      "builderQueries": {
+        "A": {
+          "queryName": "A", "expression": "A", "dataSource": "metrics",
+          "aggregateOperator": "sum",
+          "aggregateAttribute": {"key": "llm.cost.usd", "dataType": "float64", "type": "Sum"},
+          "groupBy": [], "filters": {"op": "AND", "items": []}, "disabled": false
+        }
+      }
+    }
+  },
+  "labels": {"severity": "warning", "team": "ai-platform"},
+  "annotations": {
+    "description": "LLM spend through the proxy exceeded $0.50 in 5 minutes — a runaway-usage guard.",
+    "summary": "LLM spend spike detected"
+  }
+}

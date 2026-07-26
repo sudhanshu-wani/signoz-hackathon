@@ -1,0 +1,56 @@
+{
+  "title": "LLM Proxy — AI usage observability (Agents of SigNoz)",
+  "description": "Cost, tokens, latency, and errors for all AI usage flowing through the proxy. See panels.md for the authoritative query spec.",
+  "tags": ["hackathon", "llm-proxy", "genai"],
+  "version": "v4",
+  "widgets": [
+    {
+      "id": "cost-by-model",
+      "title": "Cost by model ($)",
+      "panelTypes": "value",
+      "query": {"queryType": "builder", "builder": {"queryData": [
+        {"dataSource": "metrics", "queryName": "A", "expression": "A",
+         "aggregateOperator": "sum",
+         "aggregateAttribute": {"key": "llm.cost.usd", "dataType": "float64", "type": "Sum"},
+         "groupBy": [{"key": "model", "dataType": "string", "type": "tag"}],
+         "filters": {"op": "AND", "items": []}, "legend": "{{model}}"}
+      ], "queryFormulas": []}}
+    },
+    {
+      "id": "requests-by-model",
+      "title": "Request rate by model",
+      "panelTypes": "graph",
+      "query": {"queryType": "builder", "builder": {"queryData": [
+        {"dataSource": "metrics", "queryName": "A", "expression": "A",
+         "aggregateOperator": "rate",
+         "aggregateAttribute": {"key": "llm.requests", "dataType": "float64", "type": "Sum"},
+         "groupBy": [{"key": "model", "dataType": "string", "type": "tag"}],
+         "filters": {"op": "AND", "items": []}, "legend": "{{model}}"}
+      ], "queryFormulas": []}}
+    },
+    {
+      "id": "latency-p95",
+      "title": "P95 latency by model (ms)",
+      "panelTypes": "graph",
+      "query": {"queryType": "builder", "builder": {"queryData": [
+        {"dataSource": "metrics", "queryName": "A", "expression": "A",
+         "aggregateOperator": "p95",
+         "aggregateAttribute": {"key": "llm.request.duration", "dataType": "float64", "type": "Histogram"},
+         "groupBy": [{"key": "model", "dataType": "string", "type": "tag"}],
+         "filters": {"op": "AND", "items": []}, "legend": "{{model}}"}
+      ], "queryFormulas": []}}
+    },
+    {
+      "id": "tokens-by-model",
+      "title": "Tokens by model",
+      "panelTypes": "value",
+      "query": {"queryType": "builder", "builder": {"queryData": [
+        {"dataSource": "metrics", "queryName": "A", "expression": "A",
+         "aggregateOperator": "sum",
+         "aggregateAttribute": {"key": "llm.tokens", "dataType": "float64", "type": "Sum"},
+         "groupBy": [{"key": "model", "dataType": "string", "type": "tag"}],
+         "filters": {"op": "AND", "items": []}, "legend": "{{model}}"}
+      ], "queryFormulas": []}}
+    }
+  ]
+}
