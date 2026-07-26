@@ -28,11 +28,16 @@ app → proxy → upstream, with the OTLP arrow to SigNoz.)
 5. Bonus one-liner: a plain `curl` through the proxy appears in SigNoz seconds
    later — "anything that speaks OpenAI is now observable."
 
-## 2:15–2:45 — Learning & growth
-"Two lessons: OpenTelemetry's GenAI semantic conventions make LLM telemetry
-vendor-neutral — any OTLP backend can read this proxy. And we used SigNoz's REST
-API rather than its MCP server for programmatic access — cheaper in tokens and
-full control over payloads."
+## 2:15–2:45 — Learning & growth (deliver this unscripted — it's your credibility beat)
+Tell the real war story in your own words, roughly:
+"The hardest bug wasn't code — SigNoz silently drops all telemetry until the
+first admin account exists, because the collector can't register with the server
+without an org. Port open, containers healthy, thirty successful requests,
+nothing in the UI. Found it in the server logs: 'cannot create agent without
+orgId'. And our first spans were all zero milliseconds long — we measured the
+upstream call first and opened the span after, so we had to stamp explicit
+start and end timestamps. Now the traces show the truth: five to sixteen
+seconds per call on a small local model."
 
 ## 2:45–3:00 — Close
 "One line of config, your own SigNoz, every AI call observable. Repo and Foundry
