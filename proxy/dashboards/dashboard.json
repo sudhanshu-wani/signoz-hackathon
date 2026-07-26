@@ -54,7 +54,7 @@
     },
     {
       "id": "requests-by-model",
-      "title": "Request rate by model",
+      "title": "Requests per minute by model",
       "panelTypes": "graph",
       "query": {
         "queryType": "builder",
@@ -85,7 +85,7 @@
               "aggregations": [
                 {
                   "metricName": "llm.requests",
-                  "timeAggregation": "rate",
+                  "timeAggregation": "increase",
                   "spaceAggregation": "sum",
                   "temporality": "cumulative"
                 }
@@ -128,7 +128,7 @@
               "legend": "{{model}}",
               "aggregations": [
                 {
-                  "metricName": "llm.request.duration",
+                  "metricName": "llm.request.duration.bucket",
                   "timeAggregation": null,
                   "spaceAggregation": "p95",
                   "temporality": null
