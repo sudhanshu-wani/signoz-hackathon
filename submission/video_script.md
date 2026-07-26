@@ -17,16 +17,20 @@ and emits OpenTelemetry GenAI spans and metrics to self-hosted SigNoz, deployed
 via Foundry. No SDK, no code change, any language." (Show the one-line diagram:
 app → proxy → upstream, with the OTLP arrow to SigNoz.)
 
-## 0:55–2:15 — Demo
+## 0:55–2:15 — Demo (the incident arc — this is what wins)
 1. Show `.env`: `OPENAI_BASE_URL=http://localhost:8900/v1` — "this is the entire
    integration."
-2. `python scripts/generate_traffic.py --n 50` — real calls to real Ollama.
-3. SigNoz dashboard: **cost by model** ticking up live, request rate, P95
-   latency, tokens. Open one `gen_ai.chat` trace: model, tokens, cost on the span.
-4. Trigger the **spend-spike alert** with a burst of traffic — "runaway-usage
-   guard, out of the box."
-5. Bonus one-liner: a plain `curl` through the proxy appears in SigNoz seconds
-   later — "anything that speaks OpenAI is now observable."
+2. **Healthy state**: `generate_traffic.py --n 20 --mix` — two real Ollama
+   models; dashboard shows cost by model, **cost by feature** ("search is our
+   expensive feature"), P95 comparison between models.
+3. **Incident**: `generate_traffic.py --n 20 --mix --chaos 0.3` — "something
+   just broke in prod." The **error-rate panel goes red** on camera. These are
+   real 404s from failure injection, and say so: "I'm injecting real failures —
+   nothing here is fabricated."
+4. **Root cause in seconds**: open Traces, filter `gen_ai.chat` with errors,
+   open the failing span: model `gpt-nonexistent`, status 404. "Someone shipped
+   a bad model name. Found it without leaving my laptop."
+5. **The guard**: `--burst` trips the spend-spike alert with real traffic.
 
 ## 2:15–2:45 — Learning & growth (deliver this unscripted — it's your credibility beat)
 Tell the real war story in your own words, roughly:
