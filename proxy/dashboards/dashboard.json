@@ -37,7 +37,15 @@
                 "op": "AND",
                 "items": []
               },
-              "legend": "{{model}}"
+              "legend": "{{model}}",
+              "aggregations": [
+                {
+                  "metricName": "llm.cost.usd",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum",
+                  "temporality": "cumulative"
+                }
+              ]
             }
           ],
           "queryFormulas": []
@@ -73,7 +81,15 @@
                 "op": "AND",
                 "items": []
               },
-              "legend": "{{model}}"
+              "legend": "{{model}}",
+              "aggregations": [
+                {
+                  "metricName": "llm.requests",
+                  "timeAggregation": "rate",
+                  "spaceAggregation": "sum",
+                  "temporality": "cumulative"
+                }
+              ]
             }
           ],
           "queryFormulas": []
@@ -109,7 +125,15 @@
                 "op": "AND",
                 "items": []
               },
-              "legend": "{{model}}"
+              "legend": "{{model}}",
+              "aggregations": [
+                {
+                  "metricName": "llm.request.duration",
+                  "timeAggregation": null,
+                  "spaceAggregation": "p95",
+                  "temporality": null
+                }
+              ]
             }
           ],
           "queryFormulas": []
@@ -145,7 +169,15 @@
                 "op": "AND",
                 "items": []
               },
-              "legend": "{{model}}"
+              "legend": "{{model}}",
+              "aggregations": [
+                {
+                  "metricName": "llm.tokens",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum",
+                  "temporality": "cumulative"
+                }
+              ]
             }
           ],
           "queryFormulas": []
