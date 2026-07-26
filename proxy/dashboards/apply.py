@@ -36,8 +36,8 @@ def main() -> int:
     client = SigNozClient()
     ok = True
     try:
-        client.create_dashboard(_load("dashboard.json"))
-        print("✓ dashboard created")
+        action = client.upsert_dashboard(_load("dashboard.json"))
+        print(f"✓ dashboard {action}")
     except Exception as e:
         ok = False
         print(f"✗ dashboard failed: {e}\n  -> build from panels.md in the UI.")
@@ -45,8 +45,10 @@ def main() -> int:
         client.create_alert(_load("cost_spike_alert.json"))
         print("✓ cost-spike alert created")
     except Exception as e:
-        ok = False
-        print(f"✗ alert failed: {e}\n  -> create it in the UI (spec in cost_spike_alert.json).")
+        # Known: the rules API rejects this payload on SigNoz v0.134.
+        print(f"! alert not created via API ({type(e).__name__}) — create it in the UI:")
+        print("  Alerts -> New -> metric 'llm.cost.usd', threshold $0.05 over 5m")
+        print("  (full spec in proxy/dashboards/cost_spike_alert.json)")
     client.close()
     return 0 if ok else 1
 

@@ -67,10 +67,32 @@ class SigNozClient:
     def close(self) -> None:
         self._client.close()
 
-    # --- dashboards (verified on v0.134: POST /api/v1/dashboards, raw body) ---
+    # --- dashboards (verified on v0.134: /api/v1/dashboards, raw body) ---
     def create_dashboard(self, dashboard_json: dict) -> dict:
         """Create a dashboard from an exported dashboard JSON body."""
         return self.post("/api/v1/dashboards", dashboard_json)
+
+    def upsert_dashboard(self, dashboard_json: dict) -> str:
+        """Create the dashboard, or update the existing one with the same title.
+
+        Keeps re-runs idempotent instead of piling up duplicates.
+        Returns "created" or "updated".
+        """
+        title = dashboard_json.get("title", "")
+        existing = None
+        try:
+            for db in self.get("/api/v1/dashboards").get("data", []):
+                if db.get("data", {}).get("title") == title:
+                    existing = db["id"]
+                    break
+        except Exception:
+            pass  # listing unsupported -> fall through to plain create
+        if existing:
+            r = self._client.put(f"/api/v1/dashboards/{existing}", json=dashboard_json)
+            r.raise_for_status()
+            return "updated"
+        self.create_dashboard(dashboard_json)
+        return "created"
 
     # --- alerts (stable: /api/v1/rules) ---
     def create_alert(self, rule_json: dict) -> dict:
